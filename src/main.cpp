@@ -7,12 +7,12 @@
 #define ANALOG_READ_RESOLUTION 4095.0  // 12-bit ADC
 
 // PID parameters
-double setpoint = 7.0;  // Target pH
+double setpoint = 8.9;  // Target pH
 double input, output;   // Input from pH sensor, output to solenoid control
 double kp = 2.0, ki = 0.5, kd = 0.1; // PID coefficients
 
 // Create PID instance
-PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
+PID myPID(&input, &output, &setpoint, kp, ki, kd, REVERSE);
 
 // TFT display
 TFT_eSPI tft = TFT_eSPI();
@@ -52,7 +52,7 @@ void loop() {
     myPID.Compute();
 
     // Control solenoid
-    bool solenoidState = output > 0.5;
+    bool solenoidState = output > 0.5 && input > setpoint; // Turn ON if output > 0.5 and pH is above setpoint
     digitalWrite(SOLENOID_PIN, solenoidState ? HIGH : LOW);
 
     // Update graph
@@ -77,7 +77,7 @@ void loop() {
     tft.printf("Current pH: %.2f", input);
 
     // Debug output
-    Serial.printf("Raw ADC: %d | pH: %.2f | Solenoid: %s\n", rawADC, input, solenoidState ? "ON" : "OFF");
+    Serial.printf("Raw ADC: %d | pH: %.2f | PID out: %.2f | Solenoid: %s\n", rawADC, input, output, solenoidState ? "ON" : "OFF");
 
     delay(500); // Update interval
 }
