@@ -16,8 +16,8 @@ PID myPID(&input, &output, &setpoint, kp, ki, kd, DIRECT);
 
 // TFT display
 TFT_eSPI tft = TFT_eSPI();
-#define GRAPH_HEIGHT 120
-#define GRAPH_WIDTH 240
+#define GRAPH_HEIGHT 100
+#define GRAPH_WIDTH 320
 uint16_t graphData[GRAPH_WIDTH]; // Array to store pH values for plotting
 
 void setup() {

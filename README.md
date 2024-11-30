@@ -1,7 +1,7 @@
 
 # Aquarium CO₂ Control System
 
-This project is a CO₂ control system for an aquarium, using the LilyGO T-QT V3 S3 (ESP32-S3) board. It maintains a target pH level by reading a pH sensor and controlling a CO₂ solenoid valve via a PID controller. The system features a real-time graph of pH values and solenoid status displayed on the onboard TFT.
+This project is a CO₂ control system for an aquarium, using the LilyGO T-Display-S3 ESP32 board. It maintains a target pH level by reading a pH sensor and controlling a CO₂ solenoid valve via a PID controller. The system features a real-time graph of pH values and solenoid status displayed on the onboard TFT.
 
 ---
 
@@ -17,7 +17,7 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-QT V3
 ## Hardware Requirements
 ### Recommended Components
 1. **Microcontroller**:
-   - [LilyGO T-QT V3 S3 (ESP32-S3)](https://github.com/Xinyuan-LilyGO/T-QT)
+   - [LilyGO T-Display-S3 (ESP32-S3)](https://github.com/Xinyuan-LilyGO/T-Display-S3)
 2. **pH Sensor**:
    - [Atlas Scientific EZO-pH Kit](https://atlas-scientific.com/probes/ezo-ph-kit/) (High accuracy)
    - [DFRobot Gravity pH Sensor V2](https://www.dfrobot.com/product-1025.html) (Affordable, analog output)
@@ -57,12 +57,14 @@ cd aquarium-co2-control
 ### 3. **Configure PlatformIO**
 Ensure the `platformio.ini` file includes the following:
 ```ini
-[env:lilygo_t_qt_s3]
+[env:lilygo_t_display_s3]
 platform = espressif32
 board = esp32-s3-devkitc-1
 framework = arduino
 monitor_speed = 115200
-lib_deps = 
+upload_speed = 921600
+
+lib_deps =
     br3ttb/PID@^1.2.1
     bodmer/TFT_eSPI@^2.5.0
 ```
@@ -113,8 +115,4 @@ input = map(rawADC, 0, ANALOG_READ_RESOLUTION, 4.0, 10.0);
 ## References
 1. [Atlas Scientific pH Sensor Setup](https://atlas-scientific.com/)
 2. [DFRobot Gravity pH Sensor](https://www.dfrobot.com/product-1025.html)
-3. [LilyGO T-QT V3 S3 Documentation](https://github.com/Xinyuan-LilyGO/T-QT)
-
----
-
-Feel free to reach out with any questions or contributions! 😊
+3. [LilyGO T-Display-S3 Documentation](https://github.com/Xinyuan-LilyGO/T-Display-S3)
