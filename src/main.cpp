@@ -2,8 +2,8 @@
 #include <PID_v1.h>
 #include <TFT_eSPI.h>
 
-#define PH_SENSOR_PIN 34  // ADC pin for pH sensor
-#define SOLENOID_PIN 25   // GPIO pin to control CO2 solenoid
+#define PH_SENSOR_PIN 16  // ADC pin for pH sensor
+#define SOLENOID_PIN 21   // GPIO pin to control CO2 solenoid
 #define ANALOG_READ_RESOLUTION 4095.0  // 12-bit ADC
 
 // PID parameters

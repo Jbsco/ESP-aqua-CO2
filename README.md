@@ -34,8 +34,8 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
 ## Wiring
 | Component         | LilyGO Pin      | Notes                              |
 |--------------------|-----------------|------------------------------------|
-| pH Sensor Signal   | GPIO34 (ADC1_6) | Connect sensor output to ADC pin. |
-| Solenoid Control   | GPIO25          | Use a MOSFET to drive the solenoid. |
+| pH Sensor Signal   | GPIO16 (ADC2_5) | Connect sensor output to ADC pin. |
+| Solenoid Control   | GPIO21          | Use a MOSFET to drive the solenoid. |
 
 > **Note**: Ensure the solenoid valve has a flyback diode if driven via a relay or MOSFET to protect the microcontroller.
 
@@ -51,22 +51,7 @@ git clone https://github.com/your-username/aquarium-co2-control
 cd aquarium-co2-control
 ```
 
-### 3. **Configure PlatformIO**
-Ensure the `platformio.ini` file includes the following:
-```ini
-[env:lilygo_t_display_s3]
-platform = espressif32
-board = esp32-s3-devkitc-1
-framework = arduino
-monitor_speed = 115200
-upload_speed = 921600
-
-lib_deps =
-    br3ttb/PID@^1.2.1
-    bodmer/TFT_eSPI@^2.5.0
-```
-
-### 4. **Compile and Upload**
+### 3. **Compile and Upload**
 Connect the board and run the following in PlatformIO:
 ```bash
 pio run --target upload
