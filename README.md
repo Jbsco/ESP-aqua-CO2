@@ -22,7 +22,7 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
    - [Atlas Scientific EZO-pH Kit](https://atlas-scientific.com/kits/ph-kit/) (Higher accuracy)
    - [DFRobot Gravity pH Sensor V2](https://www.dfrobot.com/product-1025.html) (Affordable, analog output)
 3. **CO₂ Solenoid Valve**:
-   - Any 12V solenoid valve (e.g., [AQUATEK CO₂ Check Valve](https://www.aquatek-california.com/)).
+   - Any 12V solenoid valve (e.g., [AQUATEK CO₂ Solenoid Valve](https://www.aquatek-california.com/)).
 4. **Power Supply**:
    - 5V USB power supply for the LilyGO board.
    - 12V power supply for the solenoid valve.
@@ -34,7 +34,11 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
 ## Wiring
 | Component         | LilyGO Pin      | Notes                              |
 |--------------------|-----------------|------------------------------------|
-| pH Sensor Signal   | GPIO16 (ADC2_5) | Connect sensor output to ADC pin. |
+| pH Sensor Signal (Analog)   | GPIO18 (ADC2_7) | Connect sensor output to ADC pin. |
+| pH Sensor Signal (UART)   | GPIO18 (U1 RXD) | Connect sensor RX to RX pin. |
+| pH Sensor Signal (UART)   | GPIO17 (U1 TXD) | Connect sensor TX to TX pin. |
+| pH Sensor Signal (I2C)   | GPIO44 (SCL) | Connect sensor SCL to SCL pin. |
+| pH Sensor Signal (I2C)   | GPIO43 (SDA) | Connect sensor SDA to SDA pin. |
 | Solenoid Control   | GPIO21          | Use a MOSFET to drive the solenoid. |
 
 > **Note**: Ensure the solenoid valve has a flyback diode if driven via a relay or MOSFET to protect the microcontroller.
@@ -43,7 +47,7 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
 
 ## Software Setup
 ### 1. **Install PlatformIO**
-- Install [PlatformIO IDE](https://platformio.org/) in your shell of choice, or use the VS Code extension.
+- Install [PlatformIO](https://platformio.org/) in your shell of choice, or use the VS Code extension.
 
 ### 2. **Clone This Repository**
 ```bash
@@ -51,7 +55,20 @@ git clone https://github.com/your-username/aquarium-co2-control
 cd aquarium-co2-control
 ```
 
-### 3. **Compile and Upload**
+### 3. **Set the Sensor Mode**
+- In `src/main.cpp` edit line #12 to use UART, I2C, or analog sensor input:
+```
+// INPUT MODES:
+#define PH_SENSOR_MODE_UART   1 // UART with Atlas Scientific EZO-pH
+#define PH_SENSOR_MODE_I2C    2 // I2C with Atlas Scientific EZO-pH
+#define PH_SENSOR_MODE_ANALOG 3 // Analog with DFRobot pH sensor
+
+// INPUT SELECTION:
+#define PH_SENSOR_MODE PH_SENSOR_MODE_ANALOG  // Set to desired mode
+```
+
+
+### 4. **Compile and Upload**
 Connect the board and run the following in PlatformIO:
 ```bash
 pio run --target upload
@@ -79,7 +96,7 @@ pio run --target upload
 
 ---
 
-## Notes on Calibration
+## Notes on Analog Calibration
 - Calibrate the pH sensor with standard buffer solutions (e.g., pH 4, 7, 10).
 - Adjust the `map()` function in the code to match your sensor's voltage-to-pH range:
 ```cpp
