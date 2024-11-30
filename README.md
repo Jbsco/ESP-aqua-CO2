@@ -19,7 +19,7 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
 1. **Microcontroller**:
    - [LilyGO T-Display-S3 (ESP32-S3)](https://github.com/Xinyuan-LilyGO/T-Display-S3)
 2. **pH Sensor**:
-   - [Atlas Scientific EZO-pH Kit](https://atlas-scientific.com/probes/ezo-ph-kit/) (High accuracy)
+   - [Atlas Scientific EZO-pH Kit](https://atlas-scientific.com/kits/ph-kit/) (Higher accuracy)
    - [DFRobot Gravity pH Sensor V2](https://www.dfrobot.com/product-1025.html) (Affordable, analog output)
 3. **CO₂ Solenoid Valve**:
    - Any 12V solenoid valve (e.g., [AQUATEK CO₂ Check Valve](https://www.aquatek-california.com/)).
@@ -36,9 +36,6 @@ This project is a CO₂ control system for an aquarium, using the LilyGO T-Displ
 |--------------------|-----------------|------------------------------------|
 | pH Sensor Signal   | GPIO34 (ADC1_6) | Connect sensor output to ADC pin. |
 | Solenoid Control   | GPIO25          | Use a MOSFET to drive the solenoid. |
-| TFT Backlight      | GPIO2           | Controls display backlight.       |
-| TFT Data/Clock     | GPIO19/GPIO18   | MOSI and SCLK for SPI.            |
-| TFT Command        | GPIO15          | DC pin for TFT.                   |
 
 > **Note**: Ensure the solenoid valve has a flyback diode if driven via a relay or MOSFET to protect the microcontroller.
 
@@ -89,10 +86,11 @@ pio run --target upload
 ---
 
 ## Usage
-1. Connect all hardware as per the wiring diagram.
+1. Connect all hardware as per the wiring table.
 2. Power on the system.
 3. Monitor the real-time graph and solenoid status on the TFT display.
 4. Use the serial monitor (baud: 115200) for debugging.
+5. Adjust parameters as needed.
 
 ---
 
