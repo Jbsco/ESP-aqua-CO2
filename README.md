@@ -109,6 +109,12 @@ input = 10.0 - (voltage / 3.3 * (10.0 - 4.0)); // Mapping 0.0 to 3.3V to pH 4.0 
 
 ---
 
+## Display Output
+
+https://github.com/user-attachments/assets/13856b92-5b02-46ac-999c-3eb57646ebfd
+
+---
+
 ## Future Enhancements
 - Improve TFT display interface to show graph markers, setpoint, PID reponse, & any other parameters deemed useful.
 - Add photos/graphics of device wiring, setup examples, & results to README.
