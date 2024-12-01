@@ -3,13 +3,15 @@
 #include <TFT_eSPI.h>
 #include <Wire.h>
 
-//INPUT MODESe:
+#define SERIAL_DEBUG_OUTPUT 0 // Enable/disable serial debug output
+
+//INPUT MODES:
 #define PH_SENSOR_MODE_UART   1 // UART with Atlas Scientific EZO-pH
 #define PH_SENSOR_MODE_I2C    2 // I2C with Atlas Scientific EZO-pH
 #define PH_SENSOR_MODE_ANALOG 3 // Analog with DFRobot pH sensor
 
 // INPUT SELECTION:
-#define PH_SENSOR_MODE PH_SENSOR_MODE_ANALOG  // Set to desired mode
+#define PH_SENSOR_MODE PH_SENSOR_MODE_ANALOG // Set to desired mode
 
 // UART
 #if PH_SENSOR_MODE == PH_SENSOR_MODE_UART
@@ -25,17 +27,16 @@
     String response;
 // Analog
 #elif PH_SENSOR_MODE == PH_SENSOR_MODE_ANALOG
-    #define PH_SENSOR_PIN 18  // ADC pin for pH sensor
-    #define ANALOG_READ_RESOLUTION 4095.0  // 12-bit ADC
-    int response;
+    #define PH_SENSOR_PIN 18 // ADC pin for pH sensor
+    double response;
 #endif
 
-#define SOLENOID_PIN 21   // GPIO pin to control CO2 solenoid
+#define SOLENOID_PIN 21 // GPIO pin to control CO2 solenoid
 
 // PID parameters
-double setpoint = 8.9;  // Target pH
-double input, output;   // Input from pH sensor, output to solenoid control
-double kp = 2.0, ki = 0.5, kd = 0.1; // PID coefficients
+double setpoint = 7.0; // Target pH
+double input, output; // Input from pH sensor, output to solenoid control
+double kp = 25.0, ki = 1.0, kd = 5.0; // PID coefficients
 
 // Create PID instance
 PID myPID(&input, &output, &setpoint, kp, ki, kd, REVERSE);
@@ -44,7 +45,7 @@ PID myPID(&input, &output, &setpoint, kp, ki, kd, REVERSE);
 TFT_eSPI tft = TFT_eSPI();
 #define GRAPH_HEIGHT 100
 #define GRAPH_WIDTH 320
-uint16_t graphData[GRAPH_WIDTH]; // Array to store pH values for plotting
+double graphData[GRAPH_WIDTH]; // Array to store pH values for plotting
 
 void setup() {
     Serial.begin(115200);
@@ -87,7 +88,7 @@ void loop() {
     #if PH_SENSOR_MODE == PH_SENSOR_MODE_UART
         // Request pH from EZO-pH via UART
         ezoSerial.print("R\r"); // Send read command
-        delay(1000);            // Wait for response
+        delay(1000); // Wait for response
         if (ezoSerial.available()) {
             response = ezoSerial.readStringUntil('\r');
             input = response.toFloat();
@@ -102,33 +103,37 @@ void loop() {
         Wire.requestFrom(EZO_I2C_ADDRESS, 7); // Request response (7 bytes max)
         if (Wire.available() >= 4) {
             response = "";
-            while (Wire.available()) {
+            while (Wire.available())
                 response += (char)Wire.read();
-            }
             input = response.toFloat();
         }
     // Analog
     #elif PH_SENSOR_MODE == PH_SENSOR_MODE_ANALOG
         response = analogRead(PH_SENSOR_PIN);
-        input = map(response, 0, ANALOG_READ_RESOLUTION, 4.0, 10.0); // Simulated pH range (adjust as needed)
+        // Map to pH range with finer resolution
+        double voltage = response / 4095.0 * 3.3; // Calculate voltage
+        input = 10.0 - (voltage / 3.3 * (10.0 - 4.0)); // Map to simulated pH range (adjust as needed)
     #endif
 
     // Run PID computation
     myPID.Compute();
 
     // Control solenoid
-    bool solenoidState = output > 0.5 && input > setpoint; // Turn ON if output > 0.5 and pH is above setpoint
+    bool solenoidState = output > 0.5; // Turn ON if output > 0.5 and pH is above setpoint
     digitalWrite(SOLENOID_PIN, solenoidState ? HIGH : LOW);
 
-    // Update graph
-    memmove(graphData, graphData + 1, (GRAPH_WIDTH - 1) * sizeof(uint16_t));
+    // Update graph data
+    memmove(graphData, graphData + 1, (GRAPH_WIDTH - 1) * sizeof(double));
     graphData[GRAPH_WIDTH - 1] = GRAPH_HEIGHT - map(input * 10, 40, 100, 0, GRAPH_HEIGHT);
-
     // Clear and redraw graph area
     tft.fillRect(0, 0, GRAPH_WIDTH, GRAPH_HEIGHT, TFT_BLACK);
-    for (int i = 1; i < GRAPH_WIDTH; i++) {
-        tft.drawLine(i - 1, graphData[i - 1], i, graphData[i], TFT_GREEN);
-    }
+    // Draw dashed red line for setpoint
+    double setpointY = GRAPH_HEIGHT - map(setpoint * 10, 40, 100, 0, GRAPH_HEIGHT); // Map setpoint to graph Y range
+    for (int x = 10; x < 310; x += 10) // Dashed pattern: line every 10px
+        tft.drawLine(x, setpointY, x + 5, setpointY, TFT_RED); // Short dashes
+    // Draw data
+    for (int i = 1; i < GRAPH_WIDTH; i++)
+        tft.drawPixel(i - 1, graphData[i], graphData[i] > setpointY ? TFT_GREEN : TFT_YELLOW);
 
     // Display solenoid status
     tft.setTextSize(2);
@@ -141,8 +146,10 @@ void loop() {
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.printf("Current pH: %.2f", input);
 
-    // Debug output
-    Serial.printf("Response: %d | pH: %.2f | PID out: %.2f | Solenoid: %s\n", response, input, output, solenoidState ? "ON" : "OFF");
+    #if SERIAL_DEBUG_OUTPUT
+        // Debug output
+        Serial.printf("Response: %.2f | pH: %.2f | PID out: %.2f | Solenoid: %s\n", response, input, output, solenoidState ? "ON" : "OFF");
+    #endif
 
-    delay(500); // Update interval
+    delay(100); // Update interval
 }

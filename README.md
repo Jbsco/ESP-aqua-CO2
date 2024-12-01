@@ -102,9 +102,9 @@ pio run --target upload
 
 ## Notes on Analog Calibration
 - Calibrate the pH sensor with standard buffer solutions (e.g., pH 4, 7, 10).
-- Adjust the `map()` function in the code to match your sensor's voltage-to-pH range:
+- Adjust the voltage mapping in the code to match your sensor's voltage-to-pH range:
 ```cpp
-input = map(rawADC, 0, ANALOG_READ_RESOLUTION, 4.0, 10.0);
+input = 10.0 - (voltage / 3.3 * (10.0 - 4.0)); // Mapping 0.0 to 3.3V to pH 4.0 to 10.0
 ```
 
 ---
