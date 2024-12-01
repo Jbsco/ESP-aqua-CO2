@@ -60,7 +60,7 @@ cd ESP-aqua-CO2
 ```
 
 ### 3. **Set the Sensor Mode**
-- In `src/main.cpp` edit line #12 to use UART, I²C, or analog sensor input:
+- In `src/main.cpp` edit line #14 to use UART, I²C, or analog sensor input:
 ```
 // INPUT MODES:
 #define PH_SENSOR_MODE_UART   1 // UART with Atlas Scientific EZO-pH
@@ -84,9 +84,9 @@ pio run --target upload
 | Parameter       | Code Variable        | Default Value | Description                                  |
 |------------------|----------------------|---------------|----------------------------------------------|
 | Target pH        | `setpoint`           | `7.0`         | Desired pH level for the aquarium.           |
-| PID Proportional | `kp`                 | `2.0`         | Adjust for responsiveness.                   |
-| PID Integral     | `ki`                 | `0.5`         | Adjust for steady-state error correction.    |
-| PID Derivative   | `kd`                 | `0.1`         | Adjust to reduce overshoot.                  |
+| PID Proportional | `kp`                 | `25.0`         | Adjust for responsiveness.                   |
+| PID Integral     | `ki`                 | `1.0`         | Adjust for steady-state error correction.    |
+| PID Derivative   | `kd`                 | `5.0`         | Adjust to reduce overshoot.                  |
 | Update Interval  | `delay(500)`         | `500` ms      | Time between updates (ms).                   |
 
 ---
@@ -109,9 +109,37 @@ input = 10.0 - (voltage / 3.3 * (10.0 - 4.0)); // Mapping 0.0 to 3.3V to pH 4.0 
 
 ---
 
-## Display Output
+## Display Output & PID Performance
 
 https://github.com/user-attachments/assets/13856b92-5b02-46ac-999c-3eb57646ebfd
+
+The TFT display output is shown here with a 30-second period sinusoid on the analog input. Observation of the debug output shows the high proportional and derivative terms help change the solenoid setting before crossing the setpoint in both directions.
+
+```
+Response: 2288.00 | pH: 6.65 | PID out: 0.00 | Solenoid: OFF
+Response: 2248.00 | pH: 6.71 | PID out: 0.00 | Solenoid: OFF
+Response: 2199.00 | pH: 6.78 | PID out: 0.00 | Solenoid: OFF
+Response: 2156.00 | pH: 6.84 | PID out: 0.00 | Solenoid: OFF
+Response: 2117.00 | pH: 6.90 | PID out: 0.31 | Solenoid: OFF
+Response: 2066.00 | pH: 6.97 | PID out: 1.00 | Solenoid: ON
+Response: 2021.00 | pH: 7.04 | PID out: 1.00 | Solenoid: ON
+Response: 1965.00 | pH: 7.12 | PID out: 1.00 | Solenoid: ON
+Response: 1917.00 | pH: 7.19 | PID out: 1.00 | Solenoid: ON
+Response: 1877.00 | pH: 7.25 | PID out: 1.00 | Solenoid: ON
+```
+
+```
+Response: 1752.00 | pH: 7.43 | PID out: 1.00 | Solenoid: ON
+Response: 1813.00 | pH: 7.34 | PID out: 1.00 | Solenoid: ON
+Response: 1863.00 | pH: 7.27 | PID out: 1.00 | Solenoid: ON
+Response: 1907.00 | pH: 7.21 | PID out: 1.00 | Solenoid: ON
+Response: 1951.00 | pH: 7.14 | PID out: 1.00 | Solenoid: ON
+Response: 1999.00 | pH: 7.07 | PID out: 0.00 | Solenoid: OFF
+Response: 2043.00 | pH: 7.01 | PID out: 0.00 | Solenoid: OFF
+Response: 2093.00 | pH: 6.93 | PID out: 0.00 | Solenoid: OFF
+Response: 2135.00 | pH: 6.87 | PID out: 0.00 | Solenoid: OFF
+Response: 2187.00 | pH: 6.80 | PID out: 0.00 | Solenoid: OFF
+```
 
 ---
 
